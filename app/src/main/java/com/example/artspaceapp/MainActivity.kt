@@ -1,12 +1,34 @@
 package com.example.artspaceapp
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.with
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,9 +49,11 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,11 +66,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.accessibility.AccessibilityViewCommand.ScrollToPositionArguments
 import com.example.compose.ArtSpaceAppTheme
 import com.example.compose.md_theme_dark_onTertiary
 import com.example.compose.md_theme_dark_onTertiaryContainer
 import com.example.compose.md_theme_light_onTertiaryContainer
 import com.example.compose.md_theme_light_tertiary
+import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,12 +91,18 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@SuppressLint("UnusedContentLambdaTargetStateParameter")
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ArtPiece(modifier: Modifier = Modifier) {
     val firstImage = R.drawable.painting_starry_night
     val secondImage = R.drawable.girl_with_a_pearl_earring
     val thirdImage = R.drawable.the_kiss
     val fourthImage = R.drawable.mona_lisa
+
+    var visible by remember {
+        mutableStateOf(false)
+    }
 
     var title by remember {
         mutableStateOf(R.string.starry_night_title)
@@ -92,104 +124,144 @@ fun ArtPiece(modifier: Modifier = Modifier) {
         mutableStateOf(currentArtwork)
     }
 
-    Column (
-        modifier = Modifier
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-        ){
+//    AnimatedVisibility(
+//        visible = visible,
+//        enter = fadeIn() + slideInHorizontally { fullHeight -> fullHeight },
+//        ) {
 
-        Artwork(artwork = currentArtwork)
+    Column(
+            modifier = Modifier,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-        Spacer(modifier = Modifier
-            .padding(vertical = 8.dp))
-        
-        TitleAndDesc(title = title, author = author, description = description)
-
-        Spacer(modifier = Modifier
-            .padding(vertical = 12.dp))
-
-        Row(modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.Center) {
-            Button(
-                modifier = Modifier
-                    .padding(end = 6.dp)
-                    .clip(shape = RoundedCornerShape(10.dp))
-                    .height(55.dp)
-                    .weight(1f),
-                colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_dark_onTertiary),
-                onClick = {
-                    when(currentArtwork) {
-                        firstImage -> {
-                            title = R.string.mona_lisa_title
-                            author = R.string.mona_lisa_author
-                            description = R.string.mona_lisa_desc
-                            currentArtwork = fourthImage
-
-                        }
-                        secondImage -> {
-                            title = R.string.starry_night_title
-                            author = R.string.starry_night_author
-                            description = R.string.starry_night_desc
-                            currentArtwork = firstImage
-                        }
-                        thirdImage -> {
-                            title = R.string.girl_pearl_title
-                            author = R.string.girl_pearl_author
-                            description = R.string.girl_pearl_desc
-                            currentArtwork = secondImage
-                        }
-                        fourthImage -> {
-                            title = R.string.the_kiss_title
-                            author = R.string.the_kiss_author
-                            description = R.string.the_kiss_desc
-                            currentArtwork = thirdImage
-                        }
-                    }
-                }) {
-                Text(text = "Back", color = Color.White)
+        AnimatedContent(
+            targetState = currentArtwork, label = "animated",
+            transitionSpec = {
+                fadeIn(
+//                    animationSpec = tween (
+//                        5500,
+//                        delayMillis = 0,
+//                    )
+                )
+                    .togetherWith(fadeOut())
             }
-
-            Button(
+        ) {
+            Column(
                 modifier = Modifier
-                    .padding(start = 6.dp)
-                    .clip(shape = RoundedCornerShape(10.dp))
-                    .height(55.dp)
-                    .weight(1f),
-                colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_dark_onTertiary),
-                onClick = {
-                    when(currentArtwork) {
-                        firstImage -> {
-                            title = R.string.girl_pearl_title
-                            author = R.string.girl_pearl_author
-                            description = R.string.girl_pearl_desc
-                            currentArtwork = secondImage
-                    }
-                        secondImage -> {
-                            title = R.string.the_kiss_title
-                            author = R.string.the_kiss_author
-                            description = R.string.the_kiss_desc
-                            currentArtwork = thirdImage
-                        }
-                        thirdImage -> {
-                            title = R.string.mona_lisa_title
-                            author = R.string.mona_lisa_author
-                            description = R.string.mona_lisa_desc
-                            currentArtwork = fourthImage
-                        }
-                        fourthImage -> {
-                            title = R.string.starry_night_title
-                            author = R.string.starry_night_author
-                            description = R.string.starry_night_desc
-                            currentArtwork = firstImage
-                    }
-                }}) {
-                    Text(text = "Next", color = Color.White)
-            }
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
+                Artwork(artwork = it)
+
+                Spacer(
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                )
+
+                TitleAndDesc(title = title, author = author, description = description,)
+
+                Spacer(
+                    modifier = Modifier
+                        .padding(vertical = 2.dp)
+                )
+            }
         }
+            Column (){
 
+            Row(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    modifier = Modifier
+                        .padding(end = 6.dp,start = 24.dp)
+                        .clip(shape = RoundedCornerShape(10.dp))
+                        .height(55.dp)
+                        .weight(1f),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_dark_onTertiary),
+                    onClick = {
+
+                        when (currentArtwork) {
+                            firstImage -> {
+                                title = R.string.mona_lisa_title
+                                author = R.string.mona_lisa_author
+                                description = R.string.mona_lisa_desc
+                                currentArtwork = fourthImage
+
+                            }
+
+                            secondImage -> {
+                                title = R.string.starry_night_title
+                                author = R.string.starry_night_author
+                                description = R.string.starry_night_desc
+                                currentArtwork = firstImage
+                            }
+
+                            thirdImage -> {
+                                title = R.string.girl_pearl_title
+                                author = R.string.girl_pearl_author
+                                description = R.string.girl_pearl_desc
+                                currentArtwork = secondImage
+                            }
+
+                            fourthImage -> {
+                                title = R.string.the_kiss_title
+                                author = R.string.the_kiss_author
+                                description = R.string.the_kiss_desc
+                                currentArtwork = thirdImage
+                            }
+                        }
+                    }) {
+                    Text(text = "Back", color = Color.White)
+                }
+
+                Button(
+                    modifier = Modifier
+                        .padding(start = 6.dp, end = 24.dp)
+                        .clip(shape = RoundedCornerShape(10.dp))
+                        .height(55.dp)
+                        .weight(1f),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_dark_onTertiary),
+                    onClick = {
+                        when (currentArtwork) {
+                            firstImage -> {
+                                title = R.string.girl_pearl_title
+                                author = R.string.girl_pearl_author
+                                description = R.string.girl_pearl_desc
+                                currentArtwork = secondImage
+                            }
+
+                            secondImage -> {
+                                title = R.string.the_kiss_title
+                                author = R.string.the_kiss_author
+                                description = R.string.the_kiss_desc
+                                currentArtwork = thirdImage
+                            }
+
+                            thirdImage -> {
+                                title = R.string.mona_lisa_title
+                                author = R.string.mona_lisa_author
+                                description = R.string.mona_lisa_desc
+                                currentArtwork = fourthImage
+                            }
+
+                            fourthImage -> {
+                                title = R.string.starry_night_title
+                                author = R.string.starry_night_author
+                                description = R.string.starry_night_desc
+                                currentArtwork = firstImage
+                            }
+                        }
+                    }
+                ) {
+                    Text(text = "Next", color = Color.White)
+                }
+
+            }
+        }
     }
-
 }
 
 @Composable
@@ -202,7 +274,6 @@ fun Artwork(
             contentDescription = "Displaying image",
             modifier = Modifier
                 .requiredSizeIn(maxHeight = 290.dp)
-//                .fillMaxWidth()
                 .clip(RoundedCornerShape(10.dp))
         )
 }
@@ -210,6 +281,7 @@ fun Artwork(
 
 @Composable
 fun TitleAndDesc(
+    modifier: Modifier = Modifier,
     @StringRes title: Int,
     @StringRes author: Int,
     @StringRes description: Int
@@ -219,7 +291,7 @@ fun TitleAndDesc(
         .background(color = md_theme_light_tertiary)
         .fillMaxWidth()
         .size(270.dp)
-        .verticalScroll(rememberScrollState())
+        .verticalScroll(ScrollState(0))
         .padding(15.dp)
 
     ) {
