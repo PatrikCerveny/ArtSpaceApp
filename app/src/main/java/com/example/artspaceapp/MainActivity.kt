@@ -124,145 +124,132 @@ fun ArtPiece(modifier: Modifier = Modifier) {
         mutableStateOf(currentArtwork)
     }
 
-//    AnimatedVisibility(
-//        visible = visible,
-//        enter = fadeIn() + slideInHorizontally { fullHeight -> fullHeight },
-//        ) {
-
-    Column(
-            modifier = Modifier,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    Column (
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(24.dp)){
 
         AnimatedContent(
             targetState = currentArtwork, label = "animated",
             transitionSpec = {
-                fadeIn(
-//                    animationSpec = tween (
-//                        5500,
-//                        delayMillis = 0,
-//                    )
-                )
-                    .togetherWith(fadeOut())
+                fadeIn().togetherWith(fadeOut())
             }
         ) {
             Column(
-                modifier = Modifier
-                    .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 Artwork(artwork = it)
-
-                Spacer(
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                )
+            }
+        }
+        Spacer(
+            modifier = Modifier
+                .padding(vertical = 6.dp)
+        )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
                 TitleAndDesc(title = title, author = author, description = description,)
 
                 Spacer(
                     modifier = Modifier
-                        .padding(vertical = 2.dp)
+                        .padding(vertical = 6.dp)
                 )
-            }
-        }
-            Column (){
 
-            Row(
-                modifier = Modifier
-                    .fillMaxSize(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Button(
+                Row(
                     modifier = Modifier
-                        .padding(end = 6.dp,start = 24.dp)
-                        .clip(shape = RoundedCornerShape(10.dp))
-                        .height(55.dp)
-                        .weight(1f),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_dark_onTertiary),
-                    onClick = {
-
-                        when (currentArtwork) {
-                            firstImage -> {
-                                title = R.string.mona_lisa_title
-                                author = R.string.mona_lisa_author
-                                description = R.string.mona_lisa_desc
-                                currentArtwork = fourthImage
-
-                            }
-
-                            secondImage -> {
-                                title = R.string.starry_night_title
-                                author = R.string.starry_night_author
-                                description = R.string.starry_night_desc
-                                currentArtwork = firstImage
-                            }
-
-                            thirdImage -> {
-                                title = R.string.girl_pearl_title
-                                author = R.string.girl_pearl_author
-                                description = R.string.girl_pearl_desc
-                                currentArtwork = secondImage
-                            }
-
-                            fourthImage -> {
-                                title = R.string.the_kiss_title
-                                author = R.string.the_kiss_author
-                                description = R.string.the_kiss_desc
-                                currentArtwork = thirdImage
-                            }
-                        }
-                    }) {
-                    Text(text = "Back", color = Color.White)
-                }
-
-                Button(
-                    modifier = Modifier
-                        .padding(start = 6.dp, end = 24.dp)
-                        .clip(shape = RoundedCornerShape(10.dp))
-                        .height(55.dp)
-                        .weight(1f),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_dark_onTertiary),
-                    onClick = {
-                        when (currentArtwork) {
-                            firstImage -> {
-                                title = R.string.girl_pearl_title
-                                author = R.string.girl_pearl_author
-                                description = R.string.girl_pearl_desc
-                                currentArtwork = secondImage
-                            }
-
-                            secondImage -> {
-                                title = R.string.the_kiss_title
-                                author = R.string.the_kiss_author
-                                description = R.string.the_kiss_desc
-                                currentArtwork = thirdImage
-                            }
-
-                            thirdImage -> {
-                                title = R.string.mona_lisa_title
-                                author = R.string.mona_lisa_author
-                                description = R.string.mona_lisa_desc
-                                currentArtwork = fourthImage
-                            }
-
-                            fourthImage -> {
-                                title = R.string.starry_night_title
-                                author = R.string.starry_night_author
-                                description = R.string.starry_night_desc
-                                currentArtwork = firstImage
-                            }
-                        }
-                    }
+                        .fillMaxSize(),
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Text(text = "Next", color = Color.White)
-                }
+                    Button(
+                        modifier = Modifier
+                            .padding(end = 6.dp)
+                            .clip(shape = RoundedCornerShape(10.dp))
+                            .height(55.dp)
+                            .weight(1f),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_dark_onTertiary),
+                        onClick = {
 
+                            when (currentArtwork) {
+                                firstImage -> {
+                                    title = R.string.mona_lisa_title
+                                    author = R.string.mona_lisa_author
+                                    description = R.string.mona_lisa_desc
+                                    currentArtwork = fourthImage
+
+                                }
+
+                                secondImage -> {
+                                    title = R.string.starry_night_title
+                                    author = R.string.starry_night_author
+                                    description = R.string.starry_night_desc
+                                    currentArtwork = firstImage
+                                }
+
+                                thirdImage -> {
+                                    title = R.string.girl_pearl_title
+                                    author = R.string.girl_pearl_author
+                                    description = R.string.girl_pearl_desc
+                                    currentArtwork = secondImage
+                                }
+
+                                fourthImage -> {
+                                    title = R.string.the_kiss_title
+                                    author = R.string.the_kiss_author
+                                    description = R.string.the_kiss_desc
+                                    currentArtwork = thirdImage
+                                }
+                            }
+                        }) {
+                        Text(text = "Back", color = Color.White)
+                    }
+
+                    Button(
+                        modifier = Modifier
+                            .padding(start = 6.dp)
+                            .clip(shape = RoundedCornerShape(10.dp))
+                            .height(55.dp)
+                            .weight(1f),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = md_theme_dark_onTertiary),
+                        onClick = {
+                            when (currentArtwork) {
+                                firstImage -> {
+                                    title = R.string.girl_pearl_title
+                                    author = R.string.girl_pearl_author
+                                    description = R.string.girl_pearl_desc
+                                    currentArtwork = secondImage
+                                }
+
+                                secondImage -> {
+                                    title = R.string.the_kiss_title
+                                    author = R.string.the_kiss_author
+                                    description = R.string.the_kiss_desc
+                                    currentArtwork = thirdImage
+                                }
+
+                                thirdImage -> {
+                                    title = R.string.mona_lisa_title
+                                    author = R.string.mona_lisa_author
+                                    description = R.string.mona_lisa_desc
+                                    currentArtwork = fourthImage
+                                }
+
+                                fourthImage -> {
+                                    title = R.string.starry_night_title
+                                    author = R.string.starry_night_author
+                                    description = R.string.starry_night_desc
+                                    currentArtwork = firstImage
+                                }
+                            }
+                        }
+                    ) {
+                        Text(text = "Next", color = Color.White)
+                    }
+                }
             }
         }
-    }
 }
+
 
 @Composable
 fun Artwork(
